@@ -179,11 +179,32 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   }
 
   // Set several transforms that browsers typically use:
-  png_set_gray_to_rgb(png_handler.png_ptr);
+  /*png_set_gray_to_rgb(png_handler.png_ptr);
+  png_set_rgb_to_gray(png_handler.png_ptr, 1, -1, -1);
   png_set_expand(png_handler.png_ptr);
   png_set_packing(png_handler.png_ptr);
   png_set_scale_16(png_handler.png_ptr);
   png_set_tRNS_to_alpha(png_handler.png_ptr);
+  png_set_filler(png_handler.png_ptr, 0xFF, PNG_FILLER_AFTER);*/
+  // Start by expanding the image to ensure it works with a variety of depths
+  png_set_expand(png_handler.png_ptr);
+  png_set_gray_to_rgb(png_handler.png_ptr);
+  png_set_rgb_to_gray(png_handler.png_ptr, 1, -1, -1);
+  png_set_strip_alpha(png_handler.png_ptr);
+  png_set_packing(png_handler.png_ptr);
+  png_set_filler(png_handler.png_ptr, 0xFF, PNG_FILLER_AFTER);
+  png_set_tRNS_to_alpha(png_handler.png_ptr);
+  int passes = png_set_interlace_handling(png_handler.png_ptr);
+  png_set_bgr(png_handler.png_ptr);
+  png_set_swap_alpha(png_handler.png_ptr);
+  png_set_invert_alpha(png_handler.png_ptr);
+  png_set_invert_mono(png_handler.png_ptr);
+  png_set_swap(png_handler.png_ptr);
+  png_set_packswap(png_handler.png_ptr);
+  png_color_8 true_bits = {8, 8, 8, 8, 8};  // Fake shift value
+  png_set_shift(png_handler.png_ptr, &true_bits);
+  png_set_user_transform_info(png_handler.png_ptr, NULL, 8, 3);
+  png_set_scale_16(png_handler.png_ptr);
 
   int passes = png_set_interlace_handling(png_handler.png_ptr);
 
