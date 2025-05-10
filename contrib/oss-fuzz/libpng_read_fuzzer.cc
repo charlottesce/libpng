@@ -183,27 +183,27 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
       (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8))
       png_set_expand(png_handler.png_ptr);
 
-  // 2. Convert grayscale to RGB
+  // Convert grayscale to RGB
   if (color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       png_set_gray_to_rgb(png_handler.png_ptr);
 
-  // 3. Convert RGB to grayscale (dangerous if not RGB)
+  // Convert RGB to grayscale
   if (color_type == PNG_COLOR_TYPE_RGB || color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-      png_set_rgb_to_gray(png_handler.png_ptr, PNG_RGB_TO_GRAY_DEFAULT, 0.299f, 0.587f); // Error if input not RGB
+      png_set_rgb_to_gray(png_handler.png_ptr, PNG_RGB_TO_GRAY_DEFAULT, 0.299f, 0.587f); 
 
 
   if (color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       png_set_gray_to_rgb(png_handler.png_ptr);
-      
-  // 4. Strip alpha if present
+
+  // Strip alpha if present
   if (color_type & PNG_COLOR_MASK_ALPHA)
       png_set_strip_alpha(png_handler.png_ptr);
 
-  // 5. tRNS to alpha (requires tRNS chunk)
+  // tRNS to alpha
   if (png_get_valid(png_handler.png_ptr, png_handler.info_ptr, PNG_INFO_tRNS))
       png_set_tRNS_to_alpha(png_handler.png_ptr);
 
-  // 6. Packing (for bit depths < 8)
+  // Packing 
   if (bit_depth < 8)
       png_set_packing(png_handler.png_ptr);
 
