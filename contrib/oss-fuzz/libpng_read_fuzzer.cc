@@ -178,23 +178,23 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     return 0;
   }
 
-  png_set_expand(png_handler.png_ptr); // already present 
   png_set_gray_to_rgb(png_handler.png_ptr); // already present
-  png_set_rgb_to_gray(png_handler.png_ptr, 1, -1, -1);
-  png_set_strip_alpha(png_handler.png_ptr);
-  png_set_packing(png_handler.png_ptr); // already present 
-  png_set_filler(png_handler.png_ptr, 0xFF, PNG_FILLER_AFTER);
+  png_set_rgb_to_gray(png_handler.png_ptr, 1, -1, -1); // NEW
+  png_set_expand(png_handler.png_ptr); // already present
+  png_set_strip_alpha(png_handler.png_ptr); // NEW
+  png_set_packing(png_handler.png_ptr); // already present
+  png_set_filler(png_handler.png_ptr, 0xFF, PNG_FILLER_AFTER); // NEW
   png_set_tRNS_to_alpha(png_handler.png_ptr); // already present
   int passes = png_set_interlace_handling(png_handler.png_ptr); // already present
-  png_set_bgr(png_handler.png_ptr);
-  png_set_swap_alpha(png_handler.png_ptr);
-  png_set_invert_alpha(png_handler.png_ptr);
-  png_set_invert_mono(png_handler.png_ptr);
-  png_set_swap(png_handler.png_ptr);
-  png_set_packswap(png_handler.png_ptr);
-  png_color_8 true_bits = {8, 8, 8, 8, 8};  
-  png_set_shift(png_handler.png_ptr, &true_bits);
-  png_set_user_transform_info(png_handler.png_ptr, NULL, 8, 3);
+  png_set_bgr(png_handler.png_ptr); // NEW
+  png_set_swap_alpha(png_handler.png_ptr); // NEW
+  png_set_invert_alpha(png_handler.png_ptr); // NEW
+  png_set_invert_mono(png_handler.png_ptr); // NEW
+  png_set_swap(png_handler.png_ptr); // NEW
+  png_set_packswap(png_handler.png_ptr); // NEW
+  png_color_8 true_bits = {8, 8, 8, 8, 8}; // NEW
+  png_set_shift(png_handler.png_ptr, &true_bits); // NEW
+  png_set_user_transform_info(png_handler.png_ptr, NULL, 8, 3); // NEW
   png_set_scale_16(png_handler.png_ptr); // already present
 
   png_read_update_info(png_handler.png_ptr, png_handler.info_ptr);
