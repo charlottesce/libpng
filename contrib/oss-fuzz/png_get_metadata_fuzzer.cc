@@ -46,13 +46,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   int num_text;
   png_get_text(png_ptr, info_ptr, &text_ptr, &num_text);
 
-  png_textp itxt_ptr;
-  int num_itxt;
-  png_get_iTXt(png_ptr, info_ptr, &itxt_ptr, NULL, &num_itxt);
+  //png_textp itxt_ptr;
+  //int num_itxt;
+  //png_get_iTXt(png_ptr, info_ptr, &itxt_ptr, NULL, &num_itxt);
 
-  png_textp ztxt_ptr;
-  int num_ztxt;
-  png_get_zTXt(png_ptr, info_ptr, &ztxt_ptr, &num_ztxt);
+  //png_textp ztxt_ptr;
+  //int num_ztxt;
+  //png_get_zTXt(png_ptr, info_ptr, &ztxt_ptr, &num_ztxt);
 
   double gamma;
   png_get_gAMA(png_ptr, info_ptr, &gamma);
