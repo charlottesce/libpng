@@ -947,7 +947,7 @@ option SAVE_INT_32 disabled
 
 option WRITE_OPTIMIZE_CMF requires WRITE
 
-option READ_COMPRESSED_TEXT disabled
+option READ_COMPRESSED_TEXT
 option READ_iCCP enables READ_COMPRESSED_TEXT
 option READ_iTXt enables READ_COMPRESSED_TEXT
 option READ_zTXt enables READ_COMPRESSED_TEXT
