@@ -38,7 +38,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   png_read_info(png_ptr, info_ptr);
 
-  // 🔍 Appels à tes fonctions png_get_*
+  // Extract metadata
   png_timep mod_time;
   png_get_tIME(png_ptr, info_ptr, &mod_time);
 
@@ -46,12 +46,23 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   int num_text;
   png_get_text(png_ptr, info_ptr, &text_ptr, &num_text);
 
+  png_textp itxt_ptr;
+  int num_itxt;
+  png_get_iTXt(png_ptr, info_ptr, &itxt_ptr, NULL, &num_itxt);
+
+  png_textp ztxt_ptr;
+  int num_ztxt;
+  png_get_zTXt(png_ptr, info_ptr, &ztxt_ptr, &num_ztxt);
+
   double gamma;
-  int gamma_result = png_get_gAMA(png_ptr, info_ptr, &gamma);
+  png_get_gAMA(png_ptr, info_ptr, &gamma);
 
   png_uint_32 res_x, res_y;
   int unit_type;
   png_get_pHYs(png_ptr, info_ptr, &res_x, &res_y, &unit_type);
+
+  png_fixed_point white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
+  png_get_cHRM_fixed(png_ptr, info_ptr, &white_x, &white_y, &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y);
 
   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
   return 0;
