@@ -48,6 +48,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   png_read_end(png_ptr, end_info_ptr);
 
+  png_bytep* row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height);
+  for (png_uint_32 y = 0; y < height; y++) {
+    row_pointers[y] = (png_bytep)malloc(png_get_rowbytes(png_ptr, info_ptr));
+  }
+  png_read_image(png_ptr, row_pointers);
+  for (png_uint_32 y = 0; y < height; y++) {
+    free(row_pointers[y]);
+  }
+  free(row_pointers);
+
+
   // 🔍 Exploitation réelle des métadonnées
   png_timep mod_time;
   if (png_get_tIME(png_ptr, end_info_ptr, &mod_time)) {
@@ -86,6 +97,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     if (white_x > 10000) {
       volatile int dummy = white_x;
     }
+  }
+  int channels = png_get_channels(png_ptr, info_ptr);
+  png_byte color_type2 = png_get_color_type(png_ptr, info_ptr);
+
+  if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tIME)) {
+  volatile int flag = 1;
   }
 
   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info_ptr);
