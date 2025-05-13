@@ -12,7 +12,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   if (!png_ptr) return 0;
 
   png_infop info_ptr = png_create_info_struct(png_ptr);
-  png_infop end_info_ptr = png_create_info_struct(png_ptr);  // Important pour lire les metadata de fin
+  png_infop end_info_ptr = png_create_info_struct(png_ptr);
   if (!info_ptr || !end_info_ptr) {
     png_destroy_read_struct(&png_ptr, &info_ptr, &end_info_ptr);
     return 0;
@@ -24,8 +24,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   }
 
   const uint8_t* data_ptr = data;
-  size_t data_left = size;
-
   png_set_read_fn(png_ptr, (png_voidp)&data_ptr,
     [](png_structp png_ptr, png_bytep outBytes, png_size_t byteCountToRead) {
       const uint8_t** input = (const uint8_t**)png_get_io_ptr(png_ptr);
@@ -33,10 +31,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
       *input += byteCountToRead;
     });
 
-  png_set_sig_bytes(png_ptr, 8);  // Nous avons déjà vérifié la signature
+  png_set_sig_bytes(png_ptr, 8);
   png_read_info(png_ptr, info_ptr);
 
-  // Lire au moins une ligne de données pour forcer le parsing du contenu
+  // Lire une ligne
   png_uint_32 width, height;
   int bit_depth, color_type;
   png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, nullptr, nullptr, nullptr);
@@ -46,29 +44,49 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   if (row && height > 0) {
     png_read_row(png_ptr, row, NULL);
   }
-
   free(row);
 
-  // Lire la fin pour forcer les chunks comme tIME, pHYs, etc.
   png_read_end(png_ptr, end_info_ptr);
 
-  // Extraire les metadata (maintenant que la lecture est complète)
+  // 🔍 Exploitation réelle des métadonnées
   png_timep mod_time;
-  png_get_tIME(png_ptr, end_info_ptr, &mod_time);  // Doit être fait sur end_info_ptr
+  if (png_get_tIME(png_ptr, end_info_ptr, &mod_time)) {
+    if (mod_time->year > 2020) {
+      volatile int y = mod_time->year;
+    }
+  }
 
   png_textp text_ptr;
   int num_text;
-  png_get_text(png_ptr, info_ptr, &text_ptr, &num_text);
+  if (png_get_text(png_ptr, info_ptr, &text_ptr, &num_text)) {
+    if (num_text > 0 && text_ptr[0].text) {
+      if (strstr(text_ptr[0].text, "meta")) {
+        volatile char c = text_ptr[0].text[0];
+      }
+    }
+  }
 
   double gamma;
-  png_get_gAMA(png_ptr, info_ptr, &gamma);
+  if (png_get_gAMA(png_ptr, info_ptr, &gamma)) {
+    if (gamma > 0.5) {
+      volatile int dummy = gamma * 100;
+    }
+  }
 
   png_uint_32 res_x, res_y;
   int unit_type;
-  png_get_pHYs(png_ptr, info_ptr, &res_x, &res_y, &unit_type);
+  if (png_get_pHYs(png_ptr, info_ptr, &res_x, &res_y, &unit_type)) {
+    if (res_x > 300 && res_y > 300) {
+      volatile int d = res_x + res_y;
+    }
+  }
 
   png_fixed_point white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
-  png_get_cHRM_fixed(png_ptr, info_ptr, &white_x, &white_y, &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y);
+  if (png_get_cHRM_fixed(png_ptr, info_ptr, &white_x, &white_y, &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y)) {
+    if (white_x > 10000) {
+      volatile int dummy = white_x;
+    }
+  }
 
   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info_ptr);
   return 0;
