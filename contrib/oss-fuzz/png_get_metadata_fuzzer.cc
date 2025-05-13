@@ -145,6 +145,34 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   png_fixed_point ired_X, ired_Y, ired_Z, igreen_X, igreen_Y, igreen_Z, iblue_X, iblue_Y, iblue_Z;
   png_get_cHRM_XYZ_fixed(png_ptr, info_ptr, &ired_X, &ired_Y, &ired_Z, &igreen_X, &igreen_Y, &igreen_Z, &iblue_X, &iblue_Y, &iblue_Z);
 
+    // sRGB
+  int srgb_intent;
+  if (png_get_sRGB(png_ptr, info_ptr, &srgb_intent)) {
+      volatile int dummy = srgb_intent;
+  }
+
+  // sBIT
+  png_color_8p sig_bits;
+  if (png_get_sBIT(png_ptr, info_ptr, &sig_bits)) {
+      volatile int d = sig_bits->red + sig_bits->green + sig_bits->blue;
+  }
+
+  // bKGD
+  png_color_16p background;
+  if (png_get_bKGD(png_ptr, info_ptr, &background)) {
+      volatile int bg = background->red + background->green + background->blue;
+  }
+
+  // hIST
+  png_uint_16p hist = NULL;
+  int num_palette = 0;
+  png_colorp palette = NULL;
+  png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette); // Ensure palette is read
+  if (num_palette > 0 && png_get_hIST(png_ptr, info_ptr, &hist)) {
+      volatile int h = hist[0];
+  }
+
+
 
 
   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info_ptr);
