@@ -60,11 +60,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
 
   // 🔍 Exploitation réelle des métadonnées
-  png_timep mod_time;
-  if (png_get_tIME(png_ptr, end_info_ptr, &mod_time)) {
-    if (mod_time->year > 2020) {
-      volatile int y = mod_time->year;
-    }
+  png_timep mod_time_ptr = NULL;
+  if (png_get_tIME(png_ptr, end_info_ptr, &mod_time_ptr)) {
+      if (mod_time_ptr && mod_time_ptr->year > 2020) {
+          volatile int y = mod_time_ptr->year;
+      }
   }
 
   png_textp text_ptr;
@@ -87,15 +87,36 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   png_uint_32 res_x, res_y;
   int unit_type;
   if (png_get_pHYs(png_ptr, info_ptr, &res_x, &res_y, &unit_type)) {
-    if (res_x > 300 && res_y > 300) {
+      if (res_x > 300 && res_y > 300) {
+          volatile int s = res_x + res_y + unit_type;
+      }
+  }
+
+  png_uint_32 res_x, res_y;
+  int unit_type;
+  if (png_get_pHYs_dpi(png_ptr, info_ptr, &res_x, &res_y, &unit_type)) {
+    if (res_x > 300 || res_y > 300) {
       volatile int d = res_x + res_y;
     }
   }
 
+  png_colorp palette = NULL;
+  int num_palette = 0;
+
+  if (png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette)) {
+      if (num_palette > 0 && palette != NULL) {
+          // Just access the first color to ensure memory is read
+          volatile int r = palette[0].red;
+          volatile int g = palette[0].green;
+          volatile int b = palette[0].blue;
+      }
+  }
+
+
   png_fixed_point white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
   if (png_get_cHRM_fixed(png_ptr, info_ptr, &white_x, &white_y, &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y)) {
     if (white_x > 10000) {
-      volatile int dummy = white_x;
+      volatile int trigger = white_x + white_y + red_x; ;
     }
   }
   int channels = png_get_channels(png_ptr, info_ptr);
@@ -104,6 +125,27 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tIME)) {
   volatile int flag = 1;
   }
+
+  png_fixed_point gamma_fp;
+  if (png_get_gAMA_fixed(png_ptr, info_ptr, &gamma_fp)) {
+      if (gamma_fp > 4545) {
+          volatile int d = gamma_fp;
+      }
+  }
+
+  double wx, wy, rx, ry, gx, gy, bx, by;
+  png_get_cHRM(png_ptr, info_ptr, &wx, &wy, &rx, &ry, &gx, &gy, &bx, &by);
+
+  png_fixed_point fwx, fwy, frx, fry, fgx, fgy, fbx, fby;
+  png_get_cHRM_fixed(png_ptr, info_ptr, &fwx, &fwy, &frx, &fry, &fgx, &fgy, &fbx, &fby);
+
+  double red_X, red_Y, red_Z, green_X, green_Y, green_Z, blue_X, blue_Y, blue_Z;
+  png_get_cHRM_XYZ(png_ptr, info_ptr, &red_X, &red_Y, &red_Z, &green_X, &green_Y, &green_Z, &blue_X, &blue_Y, &blue_Z);
+
+  png_fixed_point ired_X, ired_Y, ired_Z, igreen_X, igreen_Y, igreen_Z, iblue_X, iblue_Y, iblue_Z;
+  png_get_cHRM_XYZ_fixed(png_ptr, info_ptr, &ired_X, &ired_Y, &ired_Z, &igreen_X, &igreen_Y, &igreen_Z, &iblue_X, &iblue_Y, &iblue_Z);
+
+
 
   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info_ptr);
   return 0;
