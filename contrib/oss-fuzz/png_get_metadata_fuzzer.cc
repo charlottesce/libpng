@@ -165,9 +165,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   png_color_8p sig_bits = NULL;
   if (png_get_sBIT(png_handler.png_ptr, png_handler.info_ptr, &sig_bits)) {
       // Use the significant bits to trigger instrumentation
-      volatile int r = sig_bits->red;
-      volatile int g = sig_bits->green;
-      volatile int b = sig_bits->blue;
+      if (sig_bits != NULL) {
+        volatile int r = sig_bits->red;
+        volatile int g = sig_bits->green;
+        volatile int b = sig_bits->blue;
+      }
   }
 
   //bKGD -- does not work 
@@ -255,7 +257,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   png_color_16p trans_color = NULL;
 
   if (png_get_tRNS(png_handler.png_ptr, png_handler.info_ptr, &trans, &num_trans, &trans_color)) {
+    if (trans != NULL) {
       volatile int alpha0 = trans[0];  // e.g., should be 0 for red
+    }
   }
 
   png_charp profile_name = NULL;
@@ -280,8 +284,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   int unit;
 
   if (png_get_sCAL_fixed(png_handler.png_ptr, png_handler.info_ptr, &unit, &scal_width, &scal_height)) {
-      printf("Width: %d\n", scal_width);
-      printf("Height: %d\n", scal_height);
+      volatile int dummy_width = scal_width;
+      volatile int dummy_heigth = scal_height;
   }
 
   png_unknown_chunkp unknown_chunks;
