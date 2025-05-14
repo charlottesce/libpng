@@ -142,7 +142,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     return 0;
   }
 
-  //PLTE -- does not work
+  //PLTE
   png_colorp palette = NULL;
   int num_palette = 0;
 
@@ -155,13 +155,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
       }
   }
 
-  // sRGB -- does not work 
+  // sRGB 
   int srgb_intent;
   if (png_get_sRGB(png_handler.png_ptr, png_handler.info_ptr, &srgb_intent)!=0) {
       volatile int dummy = srgb_intent;
   }
 
-  //sBIT --  does not work 
+  //sBIT 
   png_color_8p sig_bits = NULL;
   if (png_get_sBIT(png_handler.png_ptr, png_handler.info_ptr, &sig_bits)) {
       // Use the significant bits to trigger instrumentation
