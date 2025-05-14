@@ -53,4 +53,6 @@ $CXX $CXXFLAGS -std=c++11 -I. \
      $SRC/libpng/contrib/oss-fuzz/png_get_metadata_fuzzer.cc \
      -o $OUT/png_get_metadata_fuzzer \
      -lFuzzingEngine .libs/libpng16.a -lz
+find $SRC/libpng/contrib/oss-fuzz/generated_pngs -name "*.png" | \
+     xargs zip $OUT/png_get_metadata_fuzzer_seed_corpus.zip
 
