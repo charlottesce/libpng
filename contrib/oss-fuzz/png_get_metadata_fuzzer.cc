@@ -152,13 +152,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   }
 
   png_charp profile_name = NULL;
-  int compression_type = 0;
+  int iccp_compression_type = 0;
   png_bytep profile_data = NULL;
   png_uint_32 profile_len = 0;
 
   if (png_get_iCCP(png_ptr, info_ptr,
                   &profile_name,
-                  &compression_type,
+                  &iccp_compression_type,
                   &profile_data,
                   &profile_len)) {
       // Example access to trigger coverage
@@ -173,8 +173,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   int unit;
 
   if (png_get_sCAL_fixed(png_ptr, info_ptr, &unit, &scal_width, &scal_height)) {
-      printf("Width: %f\n", scal_width);
-      printf("Height: %f\n", scal_height);
+      printf("Width: %d\n", scal_width);
+      printf("Height: %d\n", scal_height);
   }
 
   png_unknown_chunkp unknown_chunks;
