@@ -312,21 +312,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
 
   png_read_update_info(png_handler.png_ptr, png_handler.info_ptr);
-  png_bytep row = (png_bytep)malloc(png_get_rowbytes(png_handler.png_ptr, png_handler.info_ptr));
-  if (row && height > 0) {
-    png_read_row(png_handler.png_ptr, row, NULL);
-  }
-  free(row);
+  
+  png_handler.row_ptr = png_malloc(
+      png_handler.png_ptr, png_get_rowbytes(png_handler.png_ptr,
+                                            png_handler.info_ptr));
 
-  png_bytep* row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height);
-  for (png_uint_32 y = 0; y < height; y++) {
-    row_pointers[y] = (png_bytep)malloc(png_get_rowbytes(png_handler.png_ptr, png_handler.info_ptr));
+  
+  for (png_uint_32 y = 0; y < height; ++y) {
+    png_read_row(png_handler.png_ptr,
+                  static_cast<png_bytep>(png_handler.row_ptr), nullptr);
   }
-  png_read_image(png_handler.png_ptr, row_pointers);
-  for (png_uint_32 y = 0; y < height; y++) {
-    free(row_pointers[y]);
-  }
-  free(row_pointers);
 
   png_read_end(png_handler.png_ptr, png_handler.end_info_ptr);
 
