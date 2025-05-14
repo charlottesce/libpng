@@ -42,3 +42,5 @@ $CXX $CXXFLAGS -std=c++11 -I. \
      -o $OUT/libpng_read_fuzzer \
      -lFuzzingEngine .libs/libpng16.a -lz
 
+cp $SRC/libpng/contrib/oss-fuzz/*.dict \
+     $SRC/libpng/contrib/oss-fuzz/*.options $OUT/
