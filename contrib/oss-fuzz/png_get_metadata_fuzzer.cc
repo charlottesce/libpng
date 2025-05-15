@@ -172,7 +172,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
       }
   }
 
-  //bKGD -- does not work 
+  //bKGD
   png_color_16p background;
 
   if (png_get_bKGD(png_handler.png_ptr, png_handler.info_ptr, &background)) {
